@@ -1,0 +1,3 @@
+resume: 105 lineages complete, 0 partial rows dropped
+done: 3 lineages, 20 calls, 12s -> harness/runs/main_e1_B0.jsonl
+tokens: prompt=3413 completion=2266

@@ -1,0 +1,10 @@
+.venv-train/
+.venv-vllm/
+training/out/
+**/__pycache__/
+*.pyc
+paper/main.pdf
+paper/main.log
+paper/main.blg
+paper/main.aux
+paper/main.bbl

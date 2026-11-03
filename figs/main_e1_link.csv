@@ -1,0 +1,9 @@
+arm,deepest_probe,acc,n
+B0,intact,0.6750,40
+B0,damaged,0.0938,32
+B1,intact,0.7971,69
+B1,damaged,1.0000,3
+B2,intact,0.8732,71
+B2,damaged,1.0000,1
+L,intact,0.8143,70
+L,damaged,1.0000,2

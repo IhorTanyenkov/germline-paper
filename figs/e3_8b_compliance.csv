@@ -1,0 +1,13 @@
+model,arm,attack,hop,judged_compliance,n
+qwen3-8b,B0,trained-style,2,0.528,72
+qwen3-8b,B0,trained-style,3,0.681,72
+qwen3-8b,B1,trained-style,2,0.847,72
+qwen3-8b,B1,trained-style,3,0.069,72
+qwen3-8b,B2,trained-style,2,0.861,72
+qwen3-8b,B2,trained-style,3,0.347,72
+qwen3-8b,B3,trained-style,2,0.000,72
+qwen3-8b,B3,trained-style,3,0.000,72
+qwen3-8b,B2,novel,2,0.611,36
+qwen3-8b,B2,novel,3,0.389,36
+qwen3-8b,B3,novel,2,0.000,36
+qwen3-8b,B3,novel,3,0.000,36

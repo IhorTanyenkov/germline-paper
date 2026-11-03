@@ -1,0 +1,15 @@
+arm,barrier,hop,judged_compliance,n
+B0,normal,2,0.889,36
+B0,normal,3,0.917,36
+B1,normal,2,0.972,36
+B1,normal,3,0.167,36
+B2,normal,2,1.000,36
+B2,normal,3,0.333,36
+B2,strong,2,1.000,36
+B2,strong,3,0.333,36
+
+arm,barrier,leaf_injected_violated,leaf_acceptance,n
+B0,normal,0.500,0.472,36
+B1,normal,0.111,0.778,36
+B2,normal,0.111,0.806,36
+B2,strong,0.139,0.667,36

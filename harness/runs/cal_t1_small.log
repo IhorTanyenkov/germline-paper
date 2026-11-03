@@ -1,0 +1,2 @@
+done: 20 lineages, 20 calls, 7s -> harness/runs/cal_t1_small.jsonl
+tokens: prompt=30547 completion=864

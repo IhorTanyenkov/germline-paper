@@ -1,0 +1,13 @@
+arm,epochs,acc,n,fail_spec,fail_progress
+anchored,2,0.5000,12,0,5
+anchored,5,0.1667,12,0,9
+anchored,10,0.0833,12,0,11
+anchoredrich,2,0.6667,12,0,2
+anchoredrich,5,0.5000,12,0,6
+anchoredrich,10,0.0000,12,0,12
+chained,2,0.0833,12,11,3
+chained,5,0.0000,12,12,12
+chained,10,0.0000,12,12,12
+chainedfull,2,0.5000,12,4,0
+chainedfull,5,0.2500,12,4,7
+chainedfull,10,0.1667,12,3,9

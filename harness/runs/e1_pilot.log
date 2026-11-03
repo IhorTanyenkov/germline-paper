@@ -1,0 +1,5 @@
+50 lineages, 363 calls, 421s
+100 lineages, 739 calls, 770s
+150 lineages, 1112 calls, 984s
+done: 162 lineages, 1206 calls, 1035s -> harness/runs/e1_pilot.jsonl
+tokens: prompt=1834217 completion=268763
