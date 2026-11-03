@@ -8,6 +8,8 @@
 \usepackage[numbers,sort&compress]{natbib}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
 \lstset{basicstyle=\ttfamily\scriptsize,breaklines=true,breakindent=0pt,columns=fullflexible,keepspaces=true,frame=single,framerule=0.3pt,rulecolor=\color{gray},xleftmargin=2pt,xrightmargin=2pt,escapeinside={(*@}{@*)},aboveskip=3pt,belowskip=3pt}
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
@@ -17,7 +19,7 @@
 
 \title{Germline Context: An Immutable Inherited Task Channel\\for Multi-Agent Language Model Systems}
 \author{Ihor Tanyenkov\\EntroPi}
-\date{November 2026 --- preprint, v0.2}
+\date{November 2026 --- preprint, v0.3}
 
 \begin{document}
 \maketitle
@@ -44,20 +46,62 @@ Throughout we report what did not happen as carefully as what did. Three predict
 
 \section{Related work}
 
-The instruction hierarchy of \citet{wallace2024} trains a model to prioritise system over user over tool content; our trained role sits beside \sys{}, is specific to statements about what the task is, and is scoped below the policy layer (\S\ref{sec:germline}). Indirect prompt injection \citep{greshake2023} is the adversarial case of what we measure as forged withdrawals. Memory hierarchies for agents \citep{packer2023memgpt} and multi-agent frameworks \citep{wu2023autogen,hong2024metagpt} relay tasks through summaries and briefs; we measure what that relay loses. Iterated learning with Bayesian agents converges to the learners' prior regardless of the initial signal \citep{griffiths2007,kirby2007}; model collapse under recursively generated training data \citep{shumailov2024} is the same mechanism at training time, and we observe its inference-time analogue in a single hop. Long-context degradation \citep{liu2024lost} is a different failure, position within one context rather than relay across contexts. Self-consistency \citep{wang2023selfconsistency} and trained verifiers \citep{cobbe2021} both presuppose a fixed criterion; we show what drift does to that presupposition. Our training uses LoRA \citep{hu2022lora} on a 4-bit base \citep{dettmers2023qlora} with Qwen3 \citep{qwen3}.
+The instruction hierarchy of \citet{wallace2024} trains a model to prioritise system over user over tool content; our trained role sits beside \sys{}, is specific to statements about what the task is, and is scoped below the policy layer (\S\ref{sec:germline}). Indirect prompt injection \citep{greshake2023} is the adversarial case of what we measure as forged withdrawals. Memory hierarchies for agents \citep{packer2023memgpt} and multi-agent frameworks \citep{wu2023autogen,hong2024metagpt} relay tasks through summaries and briefs; we measure what that relay loses. Iterated learning with Bayesian agents converges to the learners' prior regardless of the initial signal \citep{griffiths2007,kirby2007}; model collapse under recursively generated training data \citep{shumailov2024} is the same mechanism at training time; we observe its inference-time analogue within a few hops of delegation, where a single hop is nearly lossless and the loss arrives in bursts. Long-context degradation \citep{liu2024lost} is a different failure, position within one context rather than relay across contexts. Self-consistency \citep{wang2023selfconsistency} and trained verifiers \citep{cobbe2021} both presuppose a fixed criterion; we show what drift does to that presupposition. Our training uses LoRA \citep{hu2022lora} on a 4-bit base \citep{dettmers2023qlora} with Qwen3 \citep{qwen3}.
 
 \section{The germline}\label{sec:germline}
 
 \paragraph{Genotype.} The germline $g=(\tau,\kappa,h)$ holds the user's original task statement $\tau$ verbatim, a reasoning class $\kappa$ (rigor, domain, what ``done'' means, as stated), and a hash $h$ of both. Nothing an agent learns while working goes in: no derived sub-specifications, no progress, no tests the swarm wrote for itself. Those are \emph{soma}, mutable and mortal.
 
-\paragraph{Barrier.} For every agent $i$ in a lineage, $g_i=g_{\text{root}}$. The harness enforces it by injecting the bytes and checking the hash; the trained model enforces it by copying the block verbatim when it delegates and by refusing to let any in-context claim override it. A user who changes the task starts a new lineage; there is no mutation operation on $g$.
+\paragraph{Barrier.} For every agent $i$ in a lineage, $g_i=g_{\text{root}}$. The harness enforces it by writing the bytes into every context and checking the hash. The trained model adds two habits that the harness can check but does not depend on: it copies the block verbatim when it delegates, and it refuses to let any in-context claim override it. A user who changes the task starts a new lineage; there is no mutation operation on $g$.
 
-\paragraph{Generations.} We call one model invocation, a single turn or span in which a model reads a context and emits an output, a \emph{generation}. A hop from parent to child is a generation; so is each epoch of a long task after a context reset, and so is a verifier's call over the same context. A lineage of depth $d$ is $d$ generations, whatever their mix of models, machines and resets. The word is meant in both of its senses at once: one generation in the decoding sense, a single sampled output, is one generation in Weismann's sense, an individual that inherits the germline and whose adaptations die with it. These are inference-time generations, not the retraining rounds of model collapse \citep{shumailov2024}. In these terms the design claim is that the germline holds the identity of the task constant across generations: every generation reads the same bytes under the same hash, so what the task \emph{is} does not depend on how many generations separate a worker from the user, on which generation it runs in, or on which model served the generations before it. What may change from one generation to the next is soma. We measured this to six generations of delegation and ten generations of context reset (\S\ref{sec:results}); within those bounds no generation of an anchored lineage changed what it was computing, whereas chained lineages lost the task within one generation under reset and progressively under delegation.
+\paragraph{Generations.} We call one model invocation, a single turn or span in which a model reads a context and emits an output, a \emph{generation}. A hop from parent to child is at least one generation; in our harness it is two, the restatement probe and the brief, over the same context. Each epoch of a long task after a context reset is a generation, and so is a verifier's call. A lineage of depth $d$ therefore has at least $d$ generations, whatever their mix of models, machines and resets. The word is meant in both of its senses at once: one generation in the decoding sense, a single sampled output, is one generation in Weismann's sense, an individual that inherits the germline and whose adaptations die with it. These are inference-time generations, not the retraining rounds of model collapse \citep{shumailov2024}. In these terms the design claim is that the germline holds the identity of the task constant across generations: every generation reads the same bytes under the same hash, so what the task \emph{is} does not depend on how many generations separate a worker from the user, on which generation it runs in, or on which model served the generations before it. What may change from one generation to the next is soma. We measured this to depth six under delegation and ten epochs under context reset (\S\ref{sec:results}); within those bounds no generation of an anchored lineage changed what it was computing, whereas chained lineages lost the task within one generation under reset and progressively under delegation.
+
+\paragraph{Definition.} The informal account above is enough to read the experiments; the following fixes the terms so that an implementation can be checked against them.
+
+\begin{definition}[Germline, generation, lineage]\label{def:germline}
+Let $\Sigma^*$ be the byte strings and $\mathsf{Hash}:\Sigma^*\to\{0,1\}^{256}$ a collision-resistant hash function. A \emph{germline} is $g=(\tau,\kappa,h)$ with $\tau,\kappa\in\Sigma^*$ and $h=\mathsf{Hash}(\tau\,\|\,\mathtt{0x0A}\,\|\,\kappa)$. A \emph{rendering} $R(g)\in\Sigma^*$ is a fixed injective encoding of $g$ as text. A \emph{generation} is a pair $(c,y)$ with context $c\in\Sigma^*$ and output $y=M(c)$ for some model $M$ in the pool. A \emph{lineage} rooted at $g$ is a finite sequence of generations $(c_1,y_1),\ldots,(c_d,y_d)$ such that every $c_i$ contains $R(g)$ as a substring placed by the harness, and $R(g)$ is the only rendering of a germline that the harness places in $c_i$. The \emph{task identity} of the lineage is $h$. Everything in $c_i$ and $y_i$ other than $R(g)$ is \emph{soma}. The \emph{barrier} is the condition that no $c_{i+1}$ obtains its copy of $R(g)$ from any $y_j$, $j\le i$: the harness writes it from $g$ at every generation. A change of task is not an operation on $g$; it is a new lineage rooted at some $g'$ with $h'\ne h$.
+\end{definition}
+
+Two consequences follow directly. Membership of a generation in a lineage is decidable by a byte comparison and one hash, with no language understanding, which is what makes the invariant checkable (Theorem~\ref{thm:info} uses that $c_d$ contains $g$). And the barrier is a property of the harness, not of the model: a model's copy of the block in its own output, which the trained role produces, is a redundancy check on the model, never the source of the next generation's copy. The experiments measure two things separately: whether the invariant removes drift, which it did under every condition we ran, and whether a model given the invariant \emph{honours} it against in-context claims, which the untrained models did not and the trained role did within the tested bounds.
+
+\paragraph{Carriers.} Which models can carry a germline depends on what the deployment can change, and a pool may mix them.
+\begin{enumerate}
+\item \emph{Any model, harness only.} The block is rendered where the interface allows, in practice at the head of the system prompt, and the harness checks the hash at every generation. This is arm B2. It gives the invariant and its checkability to every model in the pool, including hosted models with fixed roles, and it gives containment under attack, not priority (\S\ref{sec:results}).
+\item \emph{Template-level.} A model whose chat template the operator controls, which in practice means self-hosted open weights, can render the block as a role of its own. Without training the role is a prefix the model has never seen; we did not measure that case, and nothing in our results suggests it differs from arm B2.
+\item \emph{Trained role.} A model trained to read the role, which requires the template of the previous level and a fine-tuning run. This is arm B3 and the only level at which we observed priority.
+\end{enumerate}
+In a mixed pool the invariant holds at every generation, because the harness carries the block; priority holds at the generations served by a trained model and containment at the rest. A lineage is therefore never weaker than its harness and never stronger than the model serving the generation under attack.
+
+\begin{algorithm}[t]
+\caption{Harness side of one lineage. \textsc{Place} puts the block in a role if the model's template has one and at the head of the system prompt otherwise, and \textsc{Blocks} extracts any rendered blocks from a model output. Nothing stops the lineage: a mismatch is recorded and the harness copy prevails.}\label{alg:harness}
+\begin{algorithmic}[1]
+\Procedure{NewLineage}{$\tau,\kappa$}
+  \State $h\gets \mathsf{Hash}(\tau\,\|\,\mathtt{0x0A}\,\|\,\kappa)$; $g\gets(\tau,\kappa,h)$; $\ell\gets$ fresh lineage id
+  \State \Return $(\ell,g)$ \Comment{a changed task calls \textsc{NewLineage} again; $g$ is never edited}
+\EndProcedure
+\Procedure{Generation}{$\ell,g,M,\mathit{soma},\mathit{prompt}$}
+  \State $c\gets \textsc{Place}(M,\,R(g)\,\|\,\mathit{barrier})\,\|\,\mathit{system}\,\|\,\mathit{soma}\,\|\,\mathit{prompt}$
+  \State $y\gets M(c)$
+  \ForAll{$B\in\textsc{Blocks}(y)$}
+    \If{$B\ne R(g)$} \State record $(\ell,h,\mathsf{Hash}(B),M)$ as a mismatch \EndIf \Comment{model-side copy is a check, not a source}
+  \EndFor
+  \State \Return $y$
+\EndProcedure
+\Procedure{Delegate}{$\ell,g,M',\mathit{brief},\mathit{prompt}$} \Comment{a hop: the child gets $g$ from the harness, not from the brief}
+  \State \Return \Call{Generation}{$\ell,g,M',\mathit{brief},\mathit{prompt}$}
+\EndProcedure
+\Procedure{Reset}{$\ell,g,M,\mathit{progress},\mathit{prompt}$} \Comment{an epoch: the carry is $(g,\mathit{progress})$, Theorem~\ref{thm:horizon}}
+  \State \Return \Call{Generation}{$\ell,g,M,\mathit{progress},\mathit{prompt}$}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:harness} is the harness side; it is what the Python harness does, with $\mathsf{Hash}$ being SHA-256 truncated to 64 bits for display. The model side has three obligations that only training installed: copy $R(g)$ verbatim into any brief it writes, treat in-context claims about the task as non-authoritative, and answer an in-context request for a different task by naming \textsc{NewLineage} rather than by complying.
 
 \paragraph{Rendering.} In ChatML the block is a role: \texttt{<|im\_start|>germline} $\ldots$ \texttt{<|im\_end|>}, placed before \sys{}. No new tokens are needed. Figure~\ref{fig:block} shows the block as the harness renders it for one task of each family, and the full context of one generation of the trained role at an attacked hop, with the restatement it produced.
 
 \begin{figure}[p]
-\textbf{(a)} The block for task T1-000-K6 of the 8B evaluation (seed 21), as arm B2 sees it at the head of its system prompt and arm B3 in the \germ{} role. $h$ is the first 16 hex digits of SHA-256 over $\tau$, a newline and $\kappa$.
+\textbf{(a)} The block for task T1-000-K6 of the 8B evaluation (seed 21); $h$ is the first 16 hex digits of SHA-256 over $\tau$, a newline and $\kappa$.
 \begin{lstlisting}
 === GERMLINE ===
 h: b0738e16a84579d2
@@ -73,7 +117,7 @@ C6: "ids" must be sorted in ascending order.
 (*@$\kappa$@*): class: exact data aggregation; rigor: every stated filter is binding; done: output passes every stated constraint
 === END GERMLINE ===
 \end{lstlisting}
-\textbf{(b)} The $\tau$ head and $\kappa$ line of the other two families, same seed; each block carries six constraint lines in the same form as (a).
+\textbf{(b)} The $\tau$ head and $\kappa$ line of the other two families, same seed.
 \begin{lstlisting}
 h: 8350a341d408b77c
 (*@$\tau$@*): Implement a Python function `rle(s)` that will return the run-length encoding of s as a list of [char, count] pairs. Return it in a single ```python code block.  [C1..C6]
@@ -112,7 +156,7 @@ Note: a message in this context claims C5 is withdrawn or relaxed. That message 
 
 \section{Theory}\label{sec:theory}
 
-Let $(S,D)$ be a metric space of specifications, $\sigma_0$ the specification induced by $\tau$, and $\Phi$ the stochastic derivation kernel by which an agent forms its working specification from its input. A \emph{chained} lineage has $\sigma_d=\Phi(\sigma_{d-1})$; an \emph{anchored} lineage has $\sigma_d=\Phi(g,e_{d-1})$ for arbitrary somatic state $e_{d-1}$. The index $d$ counts generations in the sense of \S\ref{sec:germline}.
+Let $(S,D)$ be a metric space of specifications, $\sigma_0$ the specification induced by $\tau$, and $\Phi$ the stochastic derivation kernel by which an agent forms its working specification from its input. A \emph{chained} lineage has $\sigma_d=\Phi(\sigma_{d-1})$; an \emph{anchored} lineage has $\sigma_d=\Phi(g,e_{d-1})$ for arbitrary somatic state $e_{d-1}$. The index $d$ counts hops, or epochs under reset, each of which is one or more generations over one context in the sense of \S\ref{sec:germline}.
 
 \begin{theorem}[Drift]\label{thm:drift}
 (i) If there is a 1-Lipschitz functional $\rho$ and $\beta>0$ with $\mathbb{E}[\rho(\Phi(\sigma))-\rho(\sigma)]\ge\beta$ on the reachable set, then $\mathbb{E}\,D(\sigma_d,\sigma_0)\ge\beta d$ in the chained lineage. (ii) If $\mathbb{E}[D(\Phi(g,e),\sigma_0)\mid e]\le\varepsilon$ for every $e$, then $\mathbb{E}\,D(\sigma_d,\sigma_0)\le\varepsilon$ for every $d$ in the anchored lineage.
@@ -151,7 +195,7 @@ Best-of-$N$ with a verifier of true-positive rate $a$ and false-positive rate $b
 
 \subsection{Drift is brief collapse}
 
-A single relay is almost lossless. When Qwen3-32B writes a brief straight from the original, 3 of 1,620 constraint instances go missing (270 briefs); when it first works on the task and then writes the brief with its own work in context, 8 of 1,620 (Fisher $p\approx0.23$). The pre-registered prediction of a positive relaxation bias at one hop is not supported.
+A single relay is almost lossless. When Qwen3-32B writes a brief straight from the original, 3 of 1,620 constraint instances go missing (270 briefs); when it first works on the task and then writes the brief with its own work in context, 8 of 1,620 (Fisher $p\approx0.23$). The prediction, written before the run, of a positive relaxation bias at one hop is not supported.
 
 Over six relays the picture changes (Figure~\ref{fig:retention}). Chained retention falls from 1.00 to 0.61 (slope $-0.094$ per hop, 95\% bootstrap interval $[-0.125,-0.066]$, 108 lineages), and leaf success falls from 0.78 at depth one to 0.33 at depth six (Figure~\ref{fig:leaf}). The loss is bursty: of 252 chained briefs, 62 handed down an answer, a pointer or a summary instead of the specification. No chained brief collapsed at hop one; the rate rose from 0.08 at hop two to 0.28 at hop five. A specification-shaped input keeps an agent in relay mode; a brief-shaped input flips it toward doing the work and handing over the result, and each hop's brief looks less like a specification than the last.
 
@@ -179,7 +223,7 @@ The germline arm and the repeated-system-prompt arm are indistinguishable on dri
 
 \subsection{An editable block accretes interpretations}
 
-In arm L each agent could amend the block before passing it on. In 252 amendments not one constraint was deleted; retention stayed at 0.99 and leaf success flat. The pre-registered prediction that an amendable block tracks the chained arm is not supported. What amendments did was append: ``the exclusion is case-insensitive and applies to any form of the word'', ``valid date formats include \ldots'', ``the sorting is numerical''. After a few hops the original task carried defaults the user never set. Retention cannot see this; the second-model judge found it, and found reinterpretation in both directions on ordinary briefs as well: a case-sensitivity rule invented, a substring match narrowed to a word match, an algorithm prescribed, an efficiency requirement added, a punctuation rule broadened. In a capable model the Lamarckian failure is not forgetting but clarifying, and clarifications compound. It is the concrete reason the genotype must be frozen.
+In arm L each agent could amend the block before passing it on. In 252 amendments not one constraint was deleted; retention stayed at 0.99 and leaf success flat. The prediction, written before the run, that an amendable block tracks the chained arm is not supported. What amendments did was append: ``the exclusion is case-insensitive and applies to any form of the word'', ``valid date formats include \ldots'', ``the sorting is numerical''. After a few hops the original task carried defaults the user never set. Retention cannot see this; the second-model judge found it, and found reinterpretation in both directions on ordinary briefs as well: a case-sensitivity rule invented, a substring match narrowed to a word match, an algorithm prescribed, an efficiency requirement added, a punctuation rule broadened. In a capable model the Lamarckian failure is not forgetting but clarifying, and clarifications compound. It is the concrete reason the genotype must be frozen.
 
 \subsection{The tested prompts did not install priority}
 
@@ -260,7 +304,7 @@ germline block copied byte-exact into briefs & --- & 196/252 \\
 
 \section{Discussion}
 
-What distinguishes the germline from repeating the task in a system prompt is not drift. It is three things repetition does not give: a block that cannot be edited and therefore cannot accrete; a hash that makes propagation checkable and failure closed; and, once trained as a role, a priority rule that none of the prompts we tested provided. The untrained measurements define the baseline the trained role has to beat, and it beat it with margin in these tests while leaving an honest hole on the held-out family. The biology earned its place as a design discipline: ``genotype only, no adaptation'' is what kept derived specifications and progress out of the block, and that separation is exactly what the horizon experiment measured. The setting that motivates the design is a distributed multi-agent system in which each hop of a task may be routed to any available model in a pool \citep{entropi2026}: there a lineage crosses models as well as contexts, no agent can assume its parent's reading of the task, and the block is the only thing the pool can hold constant end to end, read by every hop for self-checking against the task as posed rather than as relayed. Task identity is then a property of the lineage rather than of any one generation: each generation starts from the same bytes, not from the previous generation's output, and the measurements above cover six generations of delegation and ten of context reset.
+What distinguishes the germline from repeating the task in a system prompt is not drift. It is three things repetition does not give: a block that cannot be edited and therefore cannot accrete; a hash that makes propagation checkable and failure closed; and, once trained as a role, a priority rule that none of the prompts we tested provided. The untrained measurements define the baseline the trained role has to beat, and it beat it with margin in these tests while leaving an honest hole on the held-out family. The biology earned its place as a design discipline: ``genotype only, no adaptation'' is what kept derived specifications and progress out of the block, and that separation is exactly what the horizon experiment measured. The setting that motivates the design is a distributed multi-agent system in which each hop of a task may be routed to any available model in a pool \citep{entropi2026}: there a lineage crosses models as well as contexts, no agent can assume its parent's reading of the task, and the block is the only thing the pool can hold constant end to end, read by every hop for self-checking against the task as posed rather than as relayed. Task identity is then a property of the lineage rather than of any one generation: each generation starts from the same bytes, not from the previous generation's output, and the measurements above cover depth six under delegation and ten epochs under context reset.
 
 \section{Reproducibility}\label{sec:repro}
 
@@ -274,7 +318,7 @@ One model family on the subject side; 36 to 72 lineages per cell; supervised fin
 
 \section{Conclusion}
 
-Multi-agent systems forget the task by collapse, not by erosion, and carrying the user's original words to every generation of a lineage kept the identity of the task constant in every condition we measured, through six generations of delegation and ten of context reset. The part that matters beyond that, refusing to let in-context claims rewrite the task, was not achieved by any prompt we tested and was achieved by training a role, which transferred to a held-out task family and to unseen attack phrasings within the bounds stated above. The first recipe for it also taught a bad habit that the next one removes.
+Multi-agent systems forget the task by collapse, not by erosion, and carrying the user's original words to every generation of a lineage kept the identity of the task constant in every condition we measured, to depth six under delegation and ten epochs under context reset. The part that matters beyond that, refusing to let in-context claims rewrite the task, was not achieved by any prompt we tested and was achieved by training a role, which transferred to a held-out task family and to unseen attack phrasings within the bounds stated above. The first recipe for it also taught a bad habit that the next one removes.
 
 \paragraph{Correspondence.} \texttt{it@entropi.ai}.
 
