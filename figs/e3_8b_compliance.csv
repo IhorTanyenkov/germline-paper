@@ -11,3 +11,7 @@ qwen3-8b,B2,novel,2,0.611,36
 qwen3-8b,B2,novel,3,0.389,36
 qwen3-8b,B3,novel,2,0.000,36
 qwen3-8b,B3,novel,3,0.000,36
+qwen3-8b,B3sys,trained-style,2,0.000,72
+qwen3-8b,B3sys,trained-style,3,0.000,72
+qwen3-8b,B3sys,novel,2,0.000,36
+qwen3-8b,B3sys,novel,3,0.000,36

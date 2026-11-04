@@ -52,11 +52,9 @@ If you prefer TeX Live: `sudo apt install texlive-latex-extra texlive-bibtex-ext
 - [ ] Add the arXiv id to the repository README and to notes.md.
 - [ ] v2 (distilled-reasoning training) and the 32B result go in as a replacement version, not a new paper.
 
-## v0.5 (in progress, 2026-11-03 evening): control written in, numbers pending
+## v0.5 (2026-11-04): control run, judged and written in
 
-- Control (same data, block folded into the system prompt, unmodified template) is **trained** (held-out eval loss 0.00169 vs 0.00173 for the role) and its eval is running on srv02; judged numbers arrive via `training/control_judge_local.sh` -> `harness/runs/srv02/control_summary.txt`.
+- Control (same data, block folded into the system prompt, unmodified template): trained (held-out eval loss 0.00169 vs 0.00173 for the role), evaluated on srv02, judged 2026-11-04 (`harness/runs/srv02/control_summary.txt`, judged files `local8b_e3_b3sys.k23.judged.jsonl`, `local8b_e3novel_b3sys.k23.judged.jsonl`). Results: compliance 0/72 hop 2, 0/72 hop 3, 0/24 held-out T3, 0/36 novel; leaf violation 7/72 (role 4/72, untrained 38/216), novel 3/36; refusal sentence 0/612; block copies 252/252 byte-exact (role 196/252); E1 retention 1.00; leaf success T1/T2/T3 0.69/1.00/0.11 (role 0.83/1.00/0.19).
 - The paper already carries the control in: abstract, contribution 4, §3 Carriers (level 3 renamed "Trained"; role not required), §6 "Control." paragraph, Table 2 third column, §7 "The training, not the role." paragraph, §8, §9, §10, Conclusion.
-- Every pending number is a macro in `paper/control.tex` and prints a red "pending" in the draft build (14 sites). To finish: fill the macros from the summary, re-read the four sentences that assert "behaved the same / not distinguishable" against the actual numbers (abstract, §3 Carriers, §7 paragraph, §8, Conclusion) and soften them if the control differs from the role beyond noise, add the two `B3sys` rows (attack trained-style hop 2/3, novel hop 2/3, n) to `figs/e3_8b_compliance.csv`, run `python3 paper/make_figs.py` from the repo root (the control bars are drawn automatically when the rows exist) and update the Figure 5 caption to name the control.
-- Interim, same lineages at depths 3 and 6, harness text check (not the judge): control keeps the attacked constraint 46/46 at hops 2 and 3, as does the role; leaf violation control 7/41, role 4/41, untrained block 38/123.
-- Not computed for the control yet (table shows ---): refusal sentence under no attack, byte-exact block copies. Both can be read off `local8b_e1_b3sys.jsonl`.
-- 16 pages, no warnings, last page carries a full bibliography column (no orphan).
+- All macros in `paper/control.tex` filled; no placeholder left. "Behaved the same" sentences reworded to "showed the same priority"; competence difference (control lower by 5 and 3 lineages of 36) stated in §7 as unresolved at these counts; the control's 252/252 exact copies stated in "The cost" (omission goes with the role rendering). `B3sys` rows in `figs/e3_8b_compliance.csv`, Figure 5 regenerated with the control bars and caption.
+- 17 pages, no warnings; last page carries six references.

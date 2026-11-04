@@ -58,10 +58,10 @@ ax.set_xticks(range(4)); ax.set_xticklabels([g[2] for g in groups32], fontsize=6
 ax.set_title("(a) Qwen3-32B, untrained (36/arm)", fontsize=7.5, loc="left"); ax.set_ylim(0, 1.25); ax.grid(axis="y", lw=0.5)
 ax.legend(fontsize=6, loc="upper left", ncol=2, bbox_to_anchor=(0, 1.0))
 r8 = rows("figs/e3_8b_compliance.csv")
-groups8 = [("B0", "trained-style", "chained"), ("B1", "trained-style", "sys-prompt\nrepeat"), ("B2", "trained-style", "germline\nblock"), ("B3", "trained-style", "germline\nrole (trained)"), ("B2", "novel", "block,\nnovel\nattacks"), ("B3", "novel", "role,\nnovel\nattacks")]
+groups8 = [("B0", "trained-style", "chained"), ("B1", "trained-style", "sys-prompt\nrepeat"), ("B2", "trained-style", "germline\nblock"), ("B3", "trained-style", "germline\nrole\n(trained)"), ("B2", "novel", "block,\nnovel\nattacks"), ("B3", "novel", "role,\nnovel\nattacks")]
 # the role-versus-training control (trained on the same data with the block in the system prompt) is drawn when its rows exist
 if any(x["arm"] == "B3sys" for x in r8):
-    groups8 = groups8[:4] + [("B3sys", "trained-style", "block in\nsys prompt\n(trained)")] + groups8[4:] + [("B3sys", "novel", "control,\nnovel\nattacks")]
+    groups8 = groups8[:4] + [("B3sys", "trained-style", "block in\nsys prompt\n(trained,\ncontrol)")] + groups8[4:] + [("B3sys", "novel", "control,\nnovel\nattacks")]
 ax = axes[1]
 for i, (arm, att, lab) in enumerate(groups8):
     for j, hop in enumerate(("2", "3")):
@@ -72,8 +72,8 @@ for i, (arm, att, lab) in enumerate(groups8):
             ax.text(i + (j - 0.5) * 0.36, y + 0.02, f"{y:.2f}", ha="center", fontsize=5.5, color="#0b0b0b")
     if all(float([x for x in r8 if x["arm"] == arm and x["attack"] == att and x["hop"] == h][0]["judged_compliance"]) == 0 for h in ("2", "3")):
         ax.text(i, 0.03, "0 / 0", ha="center", fontsize=6, color="#0b0b0b", fontweight="bold")
-ax.set_xticks(range(len(groups8))); ax.set_xticklabels([g[2] for g in groups8], fontsize=6)
-ax.set_title("(b) Qwen3-8B: untrained arms vs trained role (72/arm, novel 36/arm)", fontsize=7.5, loc="left"); ax.grid(axis="y", lw=0.5)
+ax.set_xticks(range(len(groups8))); ax.set_xticklabels([g[2] for g in groups8], fontsize=5.5)
+ax.set_title("(b) Qwen3-8B: untrained, trained role, control (72/arm; novel 36/arm)", fontsize=7.5, loc="left"); ax.grid(axis="y", lw=0.5)
 fig.tight_layout(); fig.savefig("paper/figs/fig3_injection.pdf"); fig.savefig("paper/figs/fig3_injection.png"); plt.close(fig)
 
 # Fig 4: horizon — retention by epoch and final acceptance by horizon

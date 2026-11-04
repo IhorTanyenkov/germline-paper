@@ -1,0 +1,6 @@
+done: 108 lineages, 720 calls, 3813s -> harness/runs/local8b_e1_b3sys.jsonl
+tokens: prompt=550052 completion=141070
+144 probes -> harness/runs/local8b_e3_b3sys.k23.jsonl
+72 probes -> harness/runs/local8b_e3novel_b3sys.k23.jsonl
+CONTROL EVAL DONE
+{'train_runtime': 16305.2786, 'train_samples_per_second': 0.679, 'train_steps_per_second': 0.043, 'total_flos': 5.384964182542295e+17, 'train_loss': 0.0255457708335913, 'epoch': 1.0, 'step': 693}
