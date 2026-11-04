@@ -39,11 +39,27 @@ reproduce in distribution.
 
 Training (`training/train_sft.py`, QLoRA rank 32, one epoch) and the role-versus-training control
 (`training/make_control_data.py`, `training/control_remote.sh`) are described in `training/DESIGN.md`
-and in the paper's §6 and §9. The adapters are released separately (see the paper's first page once
-the URL exists).
+and in the paper's §6 and §9. The two LoRA adapters (role and control) are attached to the GitHub release of each paper
+version.
 
 ## Building the paper
 
 ```bash
 cd paper && tectonic main.tex
+```
+
+## Licence
+
+Code, run logs, training data and adapters: MIT (`LICENSE`). Paper, figures and the research
+documents: CC BY 4.0 (`paper/LICENSE`).
+
+## Citation
+
+```bibtex
+@misc{tanyenkov2026germline,
+  author = {Tanyenkov, Ihor},
+  title  = {Germline Context: An Immutable Inherited Task Channel for Multi-Agent Language Model Systems},
+  year   = {2026},
+  note   = {Preprint, v0.5. https://github.com/IhorTanyenkov/germline-paper}
+}
 ```
