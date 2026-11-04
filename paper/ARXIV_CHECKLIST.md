@@ -28,7 +28,7 @@ Control run (role vs training), launched 2026-11-03 on srv02 GPU0: `training/mak
 
 Unattended pipeline started 2026-11-03: srv02 waiter (pid in /data4/igor/germline/b3sys_waiter.pid) runs `control_remote.sh eval` when training exits, log /data4/igor/germline/logs/b3sys_eval.log; workstation job `training/control_judge_local.sh` polls for CONTROL EVAL DONE, pulls harness/runs/srv02/local8b_*b3sys*, judges, writes harness/runs/srv02/control_summary.txt.
 
-TODO before release: refs.bib `li2026constraintdrift` has "Li, Tianxiao and others" — fill the full author list from the arXiv page.
+Done 2026-11-04: refs.bib `li2026constraintdrift` carries the full author list (Li, Ma, Wen, Huang, Zhou, Fu, Cheng).
 
 v0.3 additions (2026-11-03): §3 "Generations" (one model invocation = one generation; hop, epoch, verifier call), Definition 1 (germline, generation, lineage, task identity = h, barrier as a harness property), "Carriers" (three levels: harness-only/any model = B2; template-level; trained role = B3; mixed pools), Algorithm 1 (harness side: NewLineage, Generation with mismatch record, Delegate, Reset), Figure 1 worked examples (block for T1-000-K6 seed 21 with eval variants; T2/T3 heads; hop-2 context and verbatim restatement from run c3482d95, harness/runs/srv02/e3_b3_k23.jsonl). Consistency pass: "pre-registered" removed from §6 (contradicted §9); related-work sentence no longer claims collapse in a single hop; hash symbol is Hash (H stays entropy); a hop is one or more generations over one context. Packages added: listings, algorithm, algpseudocode (listings escape is (*@ @*) because ChatML markers contain |).
 

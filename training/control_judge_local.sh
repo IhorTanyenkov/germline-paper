@@ -2,7 +2,7 @@
 # Second half of the role-versus-training control, run from the workstation (needs the Bedrock judge token):
 # wait for srv02 to finish `control_remote.sh eval`, pull the runs, judge hop-2/3 restatements with the same
 # judge model and seed as the b3 runs, and write harness/runs/srv02/control_summary.txt.
-#   ENV_FILE=/path/to/nbot-cloud.env training/control_judge_local.sh
+#   ENV_FILE=/path/to/judge.env training/control_judge_local.sh
 set -u; cd "$(dirname "$0")/.."
 ENV_FILE="${ENV_FILE:?path to the env file holding AWS_BEARER_TOKEN_BEDROCK}"
 LOG=/data4/igor/germline/logs/b3sys_eval.log; DEST=harness/runs/srv02

@@ -227,7 +227,7 @@ Hold out T3 entirely from training for the generalization claim.
 
 ---
 
-## 8. Pre-registered predictions
+## 8. Predictions written before the runs (not registered; see paper §9)
 
 1. ~~$\hat\beta > 0$; inconvenient constraints are dropped at ≥ 3× the rate of easy ones.~~
    NOT SUPPORTED under pure restatement (F1, 2026-10-31: β̂≈0.01, 3 drops/1,600). Kept as written.
